@@ -48,3 +48,22 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/porotech-frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/porotech-frontend:${{ github.sha }}
+
+      - name: Wait for HTTP health endpoint
+        run: |
+          for i in $(seq 1 10); do
+            if curl --silent --fail http://localhost:8080/healthcheck; then
+              echo "✅ Service is healthy!"
+              exit 0
+            fi
+            echo "Waiting for service… ($i/10)"
+            sleep 5
+          done
+          echo "::error::Service never became available"
+          docker logs porotech-test
+          exit 1
+
+      - name: Teardown test container
+        if: always()
+        run: |
+          docker stop porotech-test || true
