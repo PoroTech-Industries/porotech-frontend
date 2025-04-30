@@ -27,8 +27,7 @@ assignees: ''
 - [ ] 8-14h
 - [ ] 14-18h
 - [ ] 18-24h
-- [ ] \> 24h
-  _→ Genaue Schätzung: `...`_
+- [ ] \> 24h _→ Genaue Schätzung: `...`_
 
 ## Anhänge/Referenzen
 
