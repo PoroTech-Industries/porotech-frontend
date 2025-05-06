@@ -47,11 +47,3 @@ export const Small: Story = {
     label: 'Button',
   },
 };
-
-export const Porocar: Story = {
-  args: {
-    primary: false,
-    label: "Button",
-    backgroundColor: "#d63c3c"
-  }
-};
