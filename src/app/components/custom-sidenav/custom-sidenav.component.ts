@@ -22,7 +22,7 @@ export type MenuItem = {
       <img
         [width]="profilePicSize()"
         [height]="profilePicSize()"
-        src="/monkey_PNG18736.png"
+        src="/PoroIconTransparent.png"
         /> 
         <div class="header-text" [class.hide-header-text]="sideNavCallapsed()">
           <h1>Porotech</h1>

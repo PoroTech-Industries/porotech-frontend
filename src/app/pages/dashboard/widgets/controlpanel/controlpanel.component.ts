@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { WebsocketService } from '../../../dashboard/services/websocket.service';
+import { LogService } from '../../../dashboard/services/log.service';
 
 @Component({
   selector: 'app-controls',
@@ -9,25 +11,25 @@ import { MatButtonModule } from '@angular/material/button';
   template: `
     <div class="content">
       <div class="row center">
-        <button mat-icon-button color="primary" (click)="onControl('forward')">
+        <button mat-icon-button color="primary" (click)="control('forward')">
           <mat-icon>arrow_upward</mat-icon>
         </button>
       </div>
 
       <div class="row space-between">
-        <button mat-icon-button color="primary" (click)="onControl('left')">
+        <button mat-icon-button color="primary" (click)="control('left')">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="onControl('stop')">
+        <button mat-icon-button color="warn" (click)="control('stop')">
           <mat-icon>stop</mat-icon>
         </button>
-        <button mat-icon-button color="primary" (click)="onControl('right')">
+        <button mat-icon-button color="primary" (click)="control('right')">
           <mat-icon>arrow_forward</mat-icon>
         </button>
       </div>
 
       <div class="row center">
-        <button mat-icon-button color="primary" (click)="onControl('backward')">
+        <button mat-icon-button color="primary" (click)="control('backward')">
           <mat-icon>arrow_downward</mat-icon>
         </button>
       </div>
@@ -42,6 +44,9 @@ import { MatButtonModule } from '@angular/material/button';
       flex-direction: column;
       gap: 10px;
       font-family: 'Roboto', sans-serif;
+      height: 100%;
+      box-sizing: border-box;
+      justify-content: center;
     }
 
     .row {
@@ -63,8 +68,59 @@ import { MatButtonModule } from '@angular/material/button';
   `]
 })
 export class ControlsComponent {
-  onControl(direction: string) {
-    console.log('Manual control:', direction);
-    // TODO: Send control command to backend
+  pressedKeys: Set<string> = new Set();
+
+  constructor(
+    private ws: WebsocketService,
+    private logService: LogService
+  ) {}
+
+  control(direction: string) {
+    const payload = {
+      action: 'move',
+      direction: direction,
+      timestamp: new Date().toISOString()
+    };
+
+    this.ws.send(payload);
+    this.logService.add(`Sent command: ${direction}`);
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    this.pressedKeys.add(event.key.toLowerCase());
+    this.evaluateKeys();
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  handleKeyUp(event: KeyboardEvent) {
+    this.pressedKeys.delete(event.key.toLowerCase());
+  }
+
+  evaluateKeys() {
+    const keys = Array.from(this.pressedKeys);
+
+    if (keys.includes(' ') || keys.includes('space')) {
+      this.control('stop');
+      return;
+    }
+
+    if (keys.includes('w') && keys.includes('a')) {
+      this.control('forward-left');
+    } else if (keys.includes('w') && keys.includes('d')) {
+      this.control('forward-right');
+    } else if (keys.includes('s') && keys.includes('a')) {
+      this.control('backward-left');
+    } else if (keys.includes('s') && keys.includes('d')) {
+      this.control('backward-right');
+    } else if (keys.includes('w')) {
+      this.control('forward');
+    } else if (keys.includes('s')) {
+      this.control('backward');
+    } else if (keys.includes('a')) {
+      this.control('left');
+    } else if (keys.includes('d')) {
+      this.control('right');
+    }
   }
 }

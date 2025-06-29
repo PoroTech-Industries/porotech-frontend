@@ -5,6 +5,7 @@ import { DashboardService } from '@/app/services/dashboard.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { WebsocketService } from './services/websocket.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,7 +21,7 @@ import { MatMenuModule } from '@angular/material/menu';
       <mat-menu #widgetMenu="matMenu">
         @for (widget of store.widgetsToAdd(); track widget.id) {
           <button mat-menu-item (click)="store.addWidget(widget)">
-            {{ widget.label }}
+
           </button>
         } @empty {
           <button mat-menu-item>
@@ -57,4 +58,14 @@ import { MatMenuModule } from '@angular/material/menu';
 })
 export class DashboardComponent {
   store = inject(DashboardService);
+
+  constructor(private ws: WebsocketService) {}
+
+  ngOnInit() {
+    this.connect();
+  }
+
+  connect() {
+    this.ws.connect('ws://localhost:3000');
+  }
 }

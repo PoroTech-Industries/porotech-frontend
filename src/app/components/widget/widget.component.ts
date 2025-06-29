@@ -10,7 +10,6 @@ import { WidgetOptionsComponent } from "./widget-options/widget-options.componen
   imports: [NgComponentOutlet, MatButtonModule, MatIcon, WidgetOptionsComponent],
   template: `
     <div class="container mat-elevation-z3">
-      <h3 class="m-0">{{ data().label }}</h3>
       <button mat-icon-button class="settings-button" (click)="showOptions.set(true)">
         <mat-icon>settings</mat-icon>
       </button>
